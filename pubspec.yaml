@@ -62,3 +62,8 @@ flutter:
     - family: HotRestaurant
       fonts:
         - asset: assets/fonts/Hot-Restaurant.ttf
+
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+

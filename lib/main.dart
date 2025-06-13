@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_ppp_app/presentation/auth/recover_screen.dart';
 import 'firebase_options.dart'; // 👈 Agregado (lo genera `flutterfire configure`)
 import 'package:firebase_core/firebase_core.dart'; // 👈 Agregado
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'presentation/routes/app_routes.dart';
 import 'presentation/themes/app_theme.dart';
@@ -16,9 +17,12 @@ import 'presentation/orders/orders_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -28,8 +32,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Rokos Restaurant',
       theme: AppTheme.light,               // 🎨 Tema claro
-      darkTheme: AppTheme.dark,            // 🌙 Tema oscuro
-      themeMode: ThemeMode.dark,      initialRoute: Routes.splash,         // 🏁 Pantalla inicial
+
+      initialRoute: Routes.splash,         // 🏁 Pantalla inicial
       routes: {
         Routes.splash   : (_) => const SplashScreen(),
         Routes.login    : (_) => const LoginScreen(),

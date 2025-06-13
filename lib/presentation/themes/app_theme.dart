@@ -6,13 +6,4 @@ class AppTheme{
     scaffoldBackgroundColor: const Color(0xFFFDFDFD),
     fontFamily: 'Nunito',
   );
-
-  static ThemeData get dark => ThemeData.dark().copyWith(
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.deepOrange,
-      brightness: Brightness.dark,
-    ),
-    scaffoldBackgroundColor: const Color(0xFF303030),
-    fontFamily: 'Nunito',
-  );
 }

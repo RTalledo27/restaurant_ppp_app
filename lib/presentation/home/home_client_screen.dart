@@ -6,6 +6,7 @@ import '../../providers/menu_providers.dart';
 import '../../providers/cart_providers.dart';
 import '../../providers/ui_providers.dart';
 import '../routes/app_routes.dart';
+import 'package:restaurant_ppp_app/domain/entities/menu_item.dart';
 
 class HomeClientScreen extends ConsumerWidget {
   static const route = '/home-client';
