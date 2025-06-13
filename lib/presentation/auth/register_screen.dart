@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../widgets/logo/rokos_logo.dart';
 import '../widgets/rounded_field.dart';
@@ -18,19 +20,100 @@ class RegisterScreen extends HookWidget {
     final passCtrl  = useTextEditingController();
     final hidePass  = useState(true);
     final formKey   = useMemoized(() => GlobalKey<FormState>());
+    final isLoading = useState(false);
+    final formValid = useState(false); // Nuevo estado para validación
 
     const primaryColor = Color(0xFFC45525);
     const fieldFill    = Colors.white;
 
-    void submit() {
-      if (formKey.currentState!.validate()) {
-        // TODO: implementar lógica de registro
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registrando usuario…')),
-        );
-      }
+    // Función para validar el formulario en tiempo real
+    void validateForm() {
+      final isValid = formKey.currentState?.validate() ?? false;
+      formValid.value = isValid;
     }
 
+    // Agregar listeners a los controladores para validación en tiempo real
+    useEffect(() {
+      void listener() => validateForm();
+
+      nameCtrl.addListener(listener);
+      idCtrl.addListener(listener);
+      phoneCtrl.addListener(listener);
+      emailCtrl.addListener(listener);
+      passCtrl.addListener(listener);
+
+      return () {
+        nameCtrl.removeListener(listener);
+        idCtrl.removeListener(listener);
+        phoneCtrl.removeListener(listener);
+        emailCtrl.removeListener(listener);
+        passCtrl.removeListener(listener);
+      };
+    }, []);
+
+    Future<void> submit() async {
+      if (!formValid.value || isLoading.value) return;
+
+      isLoading.value = true;
+
+      try {
+        final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailCtrl.text.trim(),
+          password: passCtrl.text.trim(),
+        );
+
+        await FirebaseFirestore.instance.collection('users').doc(credential.user!.uid).set({
+          'fullName': nameCtrl.text.trim(),
+          'idNumber': idCtrl.text.trim(),
+          'phone': phoneCtrl.text.trim(),
+          'email': emailCtrl.text.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+          'role': 'user', // Aquí se asigna el rol
+        });
+
+        if (context.mounted) {
+          await Navigator.pushNamedAndRemoveUntil(
+            context,
+            Routes.homeUser,
+                (route) => false,
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        String errorMessage = 'Error al registrar';
+
+        switch (e.code) {
+          case 'weak-password':
+            errorMessage = 'La contraseña es muy débil';
+            break;
+          case 'email-already-in-use':
+            errorMessage = 'El correo ya está registrado';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Correo inválido';
+            break;
+          case 'operation-not-allowed':
+            errorMessage = 'Operación no permitida';
+            break;
+          default:
+            errorMessage = e.message ?? errorMessage;
+            break;
+        }
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${e.toString()}')),
+          );
+        }
+      } finally {
+        isLoading.value = false;
+      }
+    }
     return Scaffold(
       backgroundColor: primaryColor,
       body: SafeArea(
@@ -59,6 +142,7 @@ class RegisterScreen extends HookWidget {
                 Form(
                   key: formKey,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onChanged: () => validateForm(), // Validación automática
                   child: Column(
                     children: [
                       // Nombre completo
@@ -82,8 +166,8 @@ class RegisterScreen extends HookWidget {
                         colorHint: Color(0xFFC45225),
                         validator: (v) {
                           if (v == null || v.isEmpty) return 'Campo obligatorio';
-                          if (!RegExp(r"^[0-9]{6,10}$").hasMatch(v)) {
-                            return 'Debe ser numérico';
+                          if (!RegExp(r"^[0-9]{7,8}$").hasMatch(v)) {
+                            return 'Debe ser numérico (7-08 dígitos)';
                           }
                           return null;
                         },
@@ -150,17 +234,18 @@ class RegisterScreen extends HookWidget {
                         text: 'REGISTRARSE',
                         width: 216,
                         colorButton: Color(0xFFE2AD8C),
-                        onPressed: submit,
+                        onPressed: formValid.value ? submit : null, // Usar formValid
+                        isLoading: isLoading.value,
                       ),
-                      const SizedBox(height: 15,),
+                      const SizedBox(height: 15),
                       PrimaryButton(
                         onPressed: () => Navigator.pushReplacementNamed(
                             context, Routes.login),
-                          text: 'INICIAR SESIÓN',
-                          width: 216,
-                          colorButton: Colors.white,
-                          textColor: Color(0xFFC45225),
-                        ),
+                        text: 'INICIAR SESIÓN',
+                        width: 216,
+                        colorButton: Colors.white,
+                        textColor: Color(0xFFC45225),
+                      ),
                     ],
                   ),
                 ),

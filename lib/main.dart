@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_ppp_app/presentation/auth/recover_screen.dart';
+import 'firebase_options.dart'; // 👈 Agregado (lo genera `flutterfire configure`)
+import 'package:firebase_core/firebase_core.dart'; // 👈 Agregado
 
 import 'presentation/routes/app_routes.dart';
 import 'presentation/themes/app_theme.dart';
 import 'presentation/splash/splash_screen.dart';
 import 'presentation/auth/login_screen.dart';
 import 'presentation/auth/register_screen.dart';
+import 'presentation/home/home_cliet_screen.dart';
+import 'presentation/home/home_admin_screen.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -24,6 +32,10 @@ class MyApp extends StatelessWidget {
         Routes.login    : (_) => const LoginScreen(),
         Routes.register : (_) => const RegisterScreen(),
         Routes.recover  : (_) => const RecoverScreen(),
+        Routes.homeUser : (_) => const HomeClientScreen(), // 🟢 Corregido
+        Routes.homeAdmin: (_) => const HomeAdminScreen(),  // 🟢 Corregido
+
+
       },
     );
   }

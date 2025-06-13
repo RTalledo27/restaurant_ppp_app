@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "166948510859",
+    "project_id": "rokos-153f3",
+    "storage_bucket": "rokos-153f3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:166948510859:android:75ff631788e9bfd431088e",
+        "android_client_info": {
+          "package_name": "com.example.restaurant_ppp_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBczAiPBYnzIN7lYjmPUfx1UPkGAbR0oWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:166948510859:android:8531d40f490de56331088e",
+        "android_client_info": {
+          "package_name": "com.example.restaurant_ppp_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBczAiPBYnzIN7lYjmPUfx1UPkGAbR0oWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
