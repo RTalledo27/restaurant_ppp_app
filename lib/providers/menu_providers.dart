@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../data/datasources/menu_remote_data_source.dart';
 import '../data/repositories_impl/menu_repository_impl.dart';
 import '../domain/usecases/get_menu.dart';
+import '../domain/usecases/add_menu_item.dart';
+import '../domain/usecases/update_menu_item.dart';
 
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
@@ -19,6 +21,14 @@ final menuRepositoryProvider = Provider<MenuRepositoryImpl>((ref) {
 
 final getMenuProvider = Provider<GetMenu>((ref) {
   return GetMenu(ref.read(menuRepositoryProvider));
+});
+
+final addMenuItemProvider = Provider<AddMenuItem>((ref) {
+  return AddMenuItem(ref.read(menuRepositoryProvider));
+});
+
+final updateMenuItemProvider = Provider<UpdateMenuItem>((ref) {
+  return UpdateMenuItem(ref.read(menuRepositoryProvider));
 });
 
 final menuListStreamProvider = StreamProvider.autoDispose((ref) {
