@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../routes/app_routes.dart';
 class DeliveryBottomNav extends StatelessWidget {
   final int currentIndex;
   const DeliveryBottomNav({super.key, required this.currentIndex});
@@ -11,10 +11,14 @@ class DeliveryBottomNav extends StatelessWidget {
       onTap: (i) {
         switch (i) {
           case 0:
-            if (currentIndex != 0) Navigator.pushReplacementNamed(context, '/home-client');
+            if (currentIndex != 0) {
+              Navigator.pushReplacementNamed(context, Routes.homeUser);
+            }
             break;
           case 1:
-            Navigator.pushReplacementNamed(context, '/orders');
+            if (currentIndex != 1) {
+              Navigator.pushReplacementNamed(context, Routes.orders);
+            }
             break;
         }
       },

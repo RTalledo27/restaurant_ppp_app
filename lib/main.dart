@@ -8,8 +8,10 @@ import 'presentation/themes/app_theme.dart';
 import 'presentation/splash/splash_screen.dart';
 import 'presentation/auth/login_screen.dart';
 import 'presentation/auth/register_screen.dart';
-import 'presentation/home/home_cliet_screen.dart';
+import 'presentation/home/home_client_screen.dart';
 import 'presentation/home/home_admin_screen.dart';
+import 'presentation/orders/orders_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
