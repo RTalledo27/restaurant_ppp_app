@@ -1,4 +1,4 @@
-import '../entities/menu_item.dart';
+import 'package:restaurant_ppp_app/domain/entities/menu_item.dart';
 
 abstract class MenuRepository {
   Stream<List<MenuItem>> watchMenu();

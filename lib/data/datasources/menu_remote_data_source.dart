@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../models/menu_item_model.dart';
+import 'package:restaurant_ppp_app/data/models/menu_item_model.dart';
 
 class MenuRemoteDataSource {
   final FirebaseFirestore firestore;

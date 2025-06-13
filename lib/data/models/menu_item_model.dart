@@ -1,27 +1,30 @@
-import '../../domain/entities/menu_item.dart';
-import '../../domain/repositories/menu_repository.dart';
-import '../datasources/menu_remote_data_source.dart';
-import '../models/menu_item_model.dart';
+import 'package:restaurant_ppp_app/domain/entities/menu_item.dart';
 
-class MenuRepositoryImpl implements MenuRepository {
-  final MenuRemoteDataSource remote;
+class MenuItemModel extends MenuItem {
+  MenuItemModel({
+    required super.id,
+    required super.name,
+    required super.description,
+    required super.imageUrl,
+    required super.price,
+  });
 
-  MenuRepositoryImpl(this.remote);
-
-  @override
-  Stream<List<MenuItem>> watchMenu() {
-    return remote.watchMenu();
+  factory MenuItemModel.fromMap(Map<String, dynamic> map, String id) {
+    return MenuItemModel(
+      id: id,
+      name: map['name'] as String? ?? '',
+      description: map['description'] as String? ?? '',
+      imageUrl: map['imageUrl'] as String? ?? '',
+      price: (map['price'] as num?)?.toDouble() ?? 0,
+    );
   }
 
-  @override
-  Future<void> addMenuItem(MenuItem item) {
-    final model = MenuItemModel(
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      imageUrl: item.imageUrl,
-      price: item.price,
-    );
-    return remote.addMenuItem(model);
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'description': description,
+      'imageUrl': imageUrl,
+      'price': price,
+    };
   }
 }

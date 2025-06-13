@@ -1,7 +1,7 @@
-import '../../domain/entities/menu_item.dart';
-import '../../domain/repositories/menu_repository.dart';
-import '../datasources/menu_remote_data_source.dart';
-import '../models/menu_item_model.dart';
+import 'package:restaurant_ppp_app/domain/entities/menu_item.dart';
+import 'package:restaurant_ppp_app/domain/repositories/menu_repository.dart';
+import 'package:restaurant_ppp_app/data/datasources/menu_remote_data_source.dart';
+import 'package:restaurant_ppp_app/data/models/menu_item_model.dart';
 
 class MenuRepositoryImpl implements MenuRepository {
   final MenuRemoteDataSource remote;

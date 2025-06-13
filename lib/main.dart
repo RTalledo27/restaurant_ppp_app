@@ -27,16 +27,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Rokos Restaurant',
-      theme: AppTheme.light,               // 🎨 Tema global
-      initialRoute: Routes.splash,         // 🏁 Pantalla inicial
+      theme: AppTheme.light,               // 🎨 Tema claro
+      darkTheme: AppTheme.dark,            // 🌙 Tema oscuro
+      themeMode: ThemeMode.dark,      initialRoute: Routes.splash,         // 🏁 Pantalla inicial
       routes: {
         Routes.splash   : (_) => const SplashScreen(),
         Routes.login    : (_) => const LoginScreen(),
         Routes.register : (_) => const RegisterScreen(),
         Routes.recover  : (_) => const RecoverScreen(),
-        Routes.homeUser : (_) => const HomeClientScreen(), // 🟢 Corregido
-        Routes.homeAdmin: (_) => const HomeAdminScreen(),  // 🟢 Corregido
-
+        Routes.homeUser : (_) => const HomeClientScreen(),
+        Routes.homeAdmin: (_) => const HomeAdminScreen(),
+        Routes.orders   : (_) => const OrdersScreen(),
 
       },
     );
