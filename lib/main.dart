@@ -12,6 +12,9 @@ import 'presentation/auth/register_screen.dart';
 import 'presentation/home/home_client_screen.dart';
 import 'presentation/home/home_admin_screen.dart';
 import 'presentation/orders/orders_screen.dart';
+import 'presentation/admin/manage_menu_screen.dart';
+import 'presentation/admin/manage_branches_screen.dart';
+
 
 
 void main() async {
@@ -42,7 +45,8 @@ class MyApp extends StatelessWidget {
         Routes.homeUser : (_) => const HomeClientScreen(),
         Routes.homeAdmin: (_) => const HomeAdminScreen(),
         Routes.orders   : (_) => const OrdersScreen(),
-
+        Routes.manageMenu: (_) => const ManageMenuScreen(),
+        Routes.manageBranches: (_) => const ManageBranchesScreen(),
       },
     );
   }

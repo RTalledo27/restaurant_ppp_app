@@ -7,6 +7,7 @@ class MenuItemModel extends MenuItem {
     required super.description,
     required super.imageUrl,
     required super.price,
+    super.stock = const {},
   });
 
   factory MenuItemModel.fromMap(Map<String, dynamic> map, String id) {
@@ -16,6 +17,8 @@ class MenuItemModel extends MenuItem {
       description: map['description'] as String? ?? '',
       imageUrl: map['imageUrl'] as String? ?? '',
       price: (map['price'] as num?)?.toDouble() ?? 0,
+      stock: (map['stock'] as Map<String, dynamic>? ?? {})
+          .map((k, v) => MapEntry(k, (v as num).toInt())),
     );
   }
 
@@ -25,6 +28,7 @@ class MenuItemModel extends MenuItem {
       'description': description,
       'imageUrl': imageUrl,
       'price': price,
+      'stock': stock,
     };
   }
 }

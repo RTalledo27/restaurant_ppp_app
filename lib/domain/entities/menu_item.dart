@@ -4,6 +4,7 @@ class MenuItem {
   final String description;
   final String imageUrl;
   final double price;
+  final Map<String, int> stock;
 
   MenuItem({
     required this.id,
@@ -11,5 +12,6 @@ class MenuItem {
     required this.description,
     required this.imageUrl,
     required this.price,
+    this.stock = const {},
   });
 }

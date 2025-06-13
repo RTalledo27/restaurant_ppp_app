@@ -21,7 +21,21 @@ class MenuRepositoryImpl implements MenuRepository {
       description: item.description,
       imageUrl: item.imageUrl,
       price: item.price,
+      stock: item.stock,
     );
     return remote.addMenuItem(model);
+  }
+
+  @override
+  Future<void> updateMenuItem(MenuItem item) {
+    final model = MenuItemModel(
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      imageUrl: item.imageUrl,
+      price: item.price,
+      stock: item.stock,
+    );
+    return remote.updateMenuItem(model);
   }
 }

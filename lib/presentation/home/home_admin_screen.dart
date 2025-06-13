@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../routes/app_routes.dart';
 
 class HomeAdminScreen extends StatelessWidget {
   const HomeAdminScreen({super.key});
@@ -128,12 +129,42 @@ class HomeAdminScreen extends StatelessWidget {
                       mainAxisSpacing: 16,
                       childAspectRatio: 1.5,
                       children: [
-                        _buildFeatureCard('Menú', Icons.restaurant_menu, const Color(0xFF4CAF50)),
-                        _buildFeatureCard('Pedidos', Icons.shopping_cart, const Color(0xFF2196F3)),
-                        _buildFeatureCard('Reservas', Icons.calendar_today, const Color(0xFFFF9800)),
-                        _buildFeatureCard('Usuarios', Icons.people, const Color(0xFF9C27B0)),
-                        _buildFeatureCard('Reportes', Icons.bar_chart, const Color(0xFFF44336)),
-                        _buildFeatureCard('Configuración', Icons.settings, const Color(0xFF607D8B)),
+                        _buildFeatureCard(
+                          'Menú',
+                          Icons.restaurant_menu,
+                          const Color(0xFF4CAF50),
+                              () => Navigator.pushNamed(context, Routes.manageMenu),
+                        ),
+                        _buildFeatureCard(
+                          'Pedidos',
+                          Icons.shopping_cart,
+                          const Color(0xFF2196F3),
+                              () {},
+                        ),
+                        _buildFeatureCard(
+                          'Sucursales',
+                          Icons.store,
+                          const Color(0xFFFF9800),
+                              () => Navigator.pushNamed(context, Routes.manageBranches),
+                        ),
+                        _buildFeatureCard(
+                          'Usuarios',
+                          Icons.people,
+                          const Color(0xFF9C27B0),
+                              () {},
+                        ),
+                        _buildFeatureCard(
+                          'Reportes',
+                          Icons.bar_chart,
+                          const Color(0xFFF44336),
+                              () {},
+                        ),
+                        _buildFeatureCard(
+                          'Configuración',
+                          Icons.settings,
+                          const Color(0xFF607D8B),
+                              () {},
+                        ),
                       ],
                     ),
                   ),
@@ -190,7 +221,7 @@ class HomeAdminScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureCard(String title, IconData icon, Color color) {
+  Widget _buildFeatureCard(String title, IconData icon, Color color, VoidCallback onTap) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -198,9 +229,8 @@ class HomeAdminScreen extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          // Acción al tocar la tarjeta
-        },
+        onTap: onTap,
+
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

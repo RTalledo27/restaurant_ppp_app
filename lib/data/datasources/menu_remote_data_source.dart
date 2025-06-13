@@ -18,4 +18,8 @@ class MenuRemoteDataSource {
   Future<void> addMenuItem(MenuItemModel item) {
     return firestore.collection('menu').doc(item.id).set(item.toMap());
   }
+
+  Future<void> updateMenuItem(MenuItemModel item) {
+    return firestore.collection('menu').doc(item.id).update(item.toMap());
+  }
 }
