@@ -6,7 +6,8 @@ import '../data/repositories_impl/menu_repository_impl.dart';
 import '../domain/usecases/get_menu.dart';
 import '../domain/usecases/add_menu_item.dart';
 import '../domain/usecases/update_menu_item.dart';
-
+import 'ui_providers.dart';
+import '../domain/entities/menu_item.dart';
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
 });
@@ -33,4 +34,15 @@ final updateMenuItemProvider = Provider<UpdateMenuItem>((ref) {
 
 final menuListStreamProvider = StreamProvider.autoDispose((ref) {
   return ref.read(getMenuProvider)();
+});
+
+final filteredMenuProvider = Provider.autoDispose<AsyncValue<List<MenuItem>>>((ref) {
+  final branchId = ref.watch(branchProvider);
+  final menuAsync = ref.watch(menuListStreamProvider);
+  return menuAsync.whenData((items) {
+    if (branchId == null) return items;
+    return items
+        .where((item) => (item.stock[branchId] ?? 0) > 0)
+        .toList();
+  });
 });

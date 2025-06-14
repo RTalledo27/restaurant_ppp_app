@@ -15,6 +15,8 @@ import 'presentation/orders/orders_screen.dart';
 import 'presentation/admin/manage_menu_screen.dart';
 import 'presentation/admin/manage_branches_screen.dart';
 
+import 'presentation/orders/select_location_screen.dart';
+
 
 
 void main() async {
@@ -44,6 +46,8 @@ class MyApp extends StatelessWidget {
         Routes.recover  : (_) => const RecoverScreen(),
         Routes.homeUser : (_) => const HomeClientScreen(),
         Routes.homeAdmin: (_) => const HomeAdminScreen(),
+        Routes.selectLocation: (_) => const SelectLocationScreen(),
+
         Routes.orders   : (_) => const OrdersScreen(),
         Routes.manageMenu: (_) => const ManageMenuScreen(),
         Routes.manageBranches: (_) => const ManageBranchesScreen(),

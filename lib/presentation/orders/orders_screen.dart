@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/cart_providers.dart';
+import '../routes/app_routes.dart';
+import 'dart:io';
+
 
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
@@ -20,11 +24,8 @@ class OrdersScreen extends ConsumerWidget {
         itemBuilder: (context, i) {
           final item = cart[i];
           return ListTile(
-            leading: Image.network(
+            leading: _buildImage(
               item.item.imageUrl,
-              width: 56,
-              height: 56,
-              fit: BoxFit.cover,
             ),
             title: Text(item.item.name),
             subtitle: Column(
@@ -46,13 +47,28 @@ class OrdersScreen extends ConsumerWidget {
           : Padding(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton(
-          onPressed: () {
-            // TODO: proceed to checkout / location
+          onPressed: () async {
+            final location = await Navigator.pushNamed(
+              context,
+              Routes.selectLocation,
+            );
+            if (location != null && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Pedido confirmado')),
+              );
+              ref.read(cartProvider.notifier).clear();
+            }
           },
-          child:
-          Text('Confirmar pedido - \$${total.toStringAsFixed(2)}'),
+          child: Text('Confirmar pedido - \$${total.toStringAsFixed(2)}'),
+
         ),
       ),
     );
   }
+}
+Widget _buildImage(String url) {
+  if (url.startsWith('http')) {
+    return Image.network(url, width: 56, height: 56, fit: BoxFit.cover);
+  }
+  return Image.file(File(url), width: 56, height: 56, fit: BoxFit.cover);
 }

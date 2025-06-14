@@ -4,9 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/navigation/bottom_nav.dart';
 import '../../providers/menu_providers.dart';
 import '../../providers/cart_providers.dart';
+import '../../providers/branch_providers.dart';
+
 import '../../providers/ui_providers.dart';
 import '../routes/app_routes.dart';
 import 'package:restaurant_ppp_app/domain/entities/menu_item.dart';
+
+import 'dart:io';
+
 
 class HomeClientScreen extends ConsumerWidget {
   static const route = '/home-client';
@@ -17,7 +22,9 @@ class HomeClientScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cartCount = ref.watch(cartProvider).length;
     final promoDismissed = ref.watch(promoDismissedProvider);
-    final menuAsync = ref.watch(menuListStreamProvider);
+    final branchesAsync = ref.watch(branchListStreamProvider);
+    final menuAsync = ref.watch(filteredMenuProvider);
+
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -76,54 +83,57 @@ class HomeClientScreen extends ConsumerWidget {
           if (promoDismissed)
             Padding(
               padding: const EdgeInsets.all(16),
-              child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'Sucursal'),
-                value: ref.watch(branchProvider),
-                items: const [
-                  DropdownMenuItem(
-                      value: 'Lima', child: Text('Sucursal Lima')),
-                  DropdownMenuItem(
-                      value: 'Cusco', child: Text('Sucursal Cusco')),
-                  DropdownMenuItem(
-                      value: 'Arequipa', child: Text('Sucursal Arequipa')),
-                ],
-                onChanged: (v) =>
-                ref.read(branchProvider.notifier).state = v,
+              child: branchesAsync.when(
+                data: (branches) => DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(labelText: 'Sucursal'),
+                  value: ref.watch(branchProvider) ??
+                      (branches.isNotEmpty ? branches.first.id : null),
+                  items: branches
+                      .map((b) =>
+                      DropdownMenuItem(value: b.id, child: Text(b.name)))
+                      .toList(),
+                  onChanged: (v) =>
+                  ref.read(branchProvider.notifier).state = v,
+                ),
+                loading: () => const CircularProgressIndicator(),
+                error: (e, _) => Text('Error: $e'),
               ),
             ),
           Expanded(
             child: menuAsync.when(
-              data: (items) => ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: items.length,
-                itemBuilder: (context, i) {
-                  final item = items[i];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      leading: Image.network(
-                        item.imageUrl,
-                        width: 56,
-                        height: 56,
-                        fit: BoxFit.cover,
+            data: (items) {
+    final branchId = ref.watch(branchProvider);
+    final filtered = branchId == null
+    ? items
+        : items
+        .where((e) => (e.stock[branchId] ?? 0) > 0)
+        .toList();
+    return ListView.builder(
+    padding: const EdgeInsets.all(16),
+    itemCount: filtered.length,
+    itemBuilder: (context, i) {
+    final item = filtered[i];
+    return Card(
+    margin: const EdgeInsets.only(bottom: 12),
+    child: ListTile(
+    leading: _buildImage(item.imageUrl),
+    title: Text(item.name),
+    subtitle: Text(item.description),
+    trailing: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+    Text('\$${item.price.toStringAsFixed(2)}'),
+    IconButton(
+    icon: const Icon(Icons.add_circle_outline),
+    onPressed: () => _addToCart(context, ref, item),
+    ),
+    ],
+    ),
                       ),
-                      title: Text(item.name),
-                      subtitle: Text(item.description),
-                      trailing: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('\$${item.price.toStringAsFixed(2)}'),
-                          IconButton(
-                            icon: const Icon(Icons.add_circle_outline),
-                            onPressed: () => _addToCart(context, ref, item),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-              loading: () => const Center(child: CircularProgressIndicator()),
+    );
+    },
+    );
+            },              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error: $e')),
             ),
           ),
@@ -194,4 +204,11 @@ class HomeClientScreen extends ConsumerWidget {
       },
     );
   }
+}
+
+Widget _buildImage(String url) {
+  if (url.startsWith('http')) {
+    return Image.network(url, width: 56, height: 56, fit: BoxFit.cover);
+  }
+  return Image.file(File(url), width: 56, height: 56, fit: BoxFit.cover);
 }
