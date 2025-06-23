@@ -10,6 +10,8 @@ import '../../providers/ui_providers.dart';
 import '../routes/app_routes.dart';
 import 'package:restaurant_ppp_app/domain/entities/menu_item.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'dart:io';
 
 
@@ -32,8 +34,9 @@ class HomeClientScreen extends ConsumerWidget {
         elevation: 0,
         title: const Text('Inicio'),
         leading: IconButton(
-          icon: const Icon(Icons.person_outline),
-          onPressed: () {/* TODO: abrir perfil */},
+          icon: const Icon(Icons.receipt_long),
+          onPressed: () => Navigator.pushNamed(context, Routes.myOrders),
+
         ),
         actions: [
           IconButton(
@@ -61,6 +64,19 @@ class HomeClientScreen extends ConsumerWidget {
               ],
             ),
             onPressed: () => Navigator.pushNamed(context, Routes.orders),
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  Routes.login,
+                      (route) => false,
+                );
+              }
+            },
           ),
         ],
       ),

@@ -6,6 +6,7 @@ class Routes {
    static const homeUser = '/home-client';
    static const homeAdmin = '/home-admin';
    static const orders = '/orders';
+   static const myOrders = '/my-orders';
    static const manageMenu = '/manage-menu';
    static const manageBranches = '/manage-branches';
    static const manageOrders = '/manage-orders';

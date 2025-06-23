@@ -16,4 +16,16 @@ class OrderRemoteDataSource {
   Future<void> updateOrderStatus(String id, String status) {
     return firestore.collection('orders').doc(id).update({'status': status});
   }
+
+  Stream<List<OrderModel>> watchOrdersByUser(String userId) {
+    return firestore
+        .collection('orders')
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (s) =>
+          s.docs.map((d) => OrderModel.fromMap(d.data(), d.id)).toList(),
+    );
+  }
 }

@@ -20,8 +20,13 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
   }
 
   Future<void> _checkPermission() async {
-    await Geolocator.requestPermission();
-  }
+    final perm = await Geolocator.requestPermission();
+    if (perm == LocationPermission.always || perm == LocationPermission.whileInUse) {
+      final pos = await Geolocator.getCurrentPosition();
+      setState(() {
+        _selected = LatLng(pos.latitude, pos.longitude);
+      });
+    }  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,14 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
           target: LatLng(-12.0464, -77.0428),
           zoom: 14,
         ),
-        onMapCreated: (c) => _controller = c,
+        onMapCreated: (c) async {
+          _controller = c;
+          if (_selected != null) {
+            await _controller.moveCamera(
+              CameraUpdate.newLatLng(_selected!),
+            );
+          }
+        },
         myLocationEnabled: true,
         myLocationButtonEnabled: true,
         onTap: (p) => setState(() => _selected = p),

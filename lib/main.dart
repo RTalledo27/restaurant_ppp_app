@@ -14,6 +14,7 @@ import 'presentation/home/home_admin_screen.dart';
 import 'presentation/orders/orders_screen.dart';
 import 'presentation/admin/manage_menu_screen.dart';
 import 'presentation/admin/manage_branches_screen.dart';
+import 'presentation/orders/my_orders_screen.dart';
 
 import 'presentation/admin/manage_orders_screen.dart';
 import 'presentation/admin/manage_users_screen.dart';
@@ -57,6 +58,8 @@ class MyApp extends StatelessWidget {
         Routes.orders   : (_) => const OrdersScreen(),
         Routes.manageMenu: (_) => const ManageMenuScreen(),
         Routes.manageBranches: (_) => const ManageBranchesScreen(),
+
+        Routes.myOrders : (_) => const MyOrdersScreen(),
 
 
         Routes.manageOrders: (_) => const ManageOrdersScreen(),

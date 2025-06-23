@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../providers/cart_providers.dart';
 import '../routes/app_routes.dart';
 import 'dart:io';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 
 
 class OrdersScreen extends ConsumerWidget {
@@ -53,7 +52,7 @@ class OrdersScreen extends ConsumerWidget {
             final location = await Navigator.pushNamed(
               context,
               Routes.selectLocation,
-            )as LatLng?;
+            ) as LatLng?;
             if (location != null && context.mounted) {
               final user = FirebaseAuth.instance.currentUser;
               await FirebaseFirestore.instance.collection('orders').add({

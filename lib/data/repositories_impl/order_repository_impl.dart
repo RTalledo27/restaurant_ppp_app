@@ -7,7 +7,16 @@ class OrderRepositoryImpl implements OrderRepository {
   OrderRepositoryImpl(this.remote);
 
   @override
-  Stream<List<Order>> watchOrders() => remote.watchOrders();
+  Stream<List<Order>> watchOrders() {
+    return remote.watchOrders().map((orders) => orders.cast<Order>());
+  }
+
+  @override
+  Stream<List<Order>> watchOrdersByUser(String userId) {
+    return remote
+        .watchOrdersByUser(userId)
+        .map((orders) => orders.cast<Order>());
+  }
 
   @override
   Future<void> updateOrderStatus(String id, String status) {
