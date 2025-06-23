@@ -10,6 +10,8 @@ import 'package:restaurant_ppp_app/domain/entities/menu_item.dart';
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
+import 'dart:async';
+
 
 class HomeClientScreen extends ConsumerWidget {
   static const route = '/home-client';
@@ -30,6 +32,9 @@ class HomeClientScreen extends ConsumerWidget {
         ref.read(branchProvider.notifier).state = branches.first.id);
       }
     });
+
+
+
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

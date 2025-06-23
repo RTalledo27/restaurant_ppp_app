@@ -9,18 +9,43 @@ class ManageBranchesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final branchesAsync = ref.watch(branchListStreamProvider);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Sucursales')),
+      appBar: AppBar(
+        title: const Text('Sucursales'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
       body: branchesAsync.when(
-        data: (items) => ListView.builder(
+        data: (items) => ListView.separated(
+          padding: const EdgeInsets.all(16),
           itemCount: items.length,
-          itemBuilder: (context, i) => ListTile(
-            title: Text(items[i].name),
-            subtitle: Text(items[i].address),
-          ),
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, i) {
+            final branch = items[i];
+            return Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 2,
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                title: Text(
+                  branch.name,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(
+                  branch.address,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(
+          child: Text('Error: $e', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showForm(context, ref),
@@ -37,28 +62,52 @@ class ManageBranchesScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Nueva sucursal'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: idCtrl, decoration: const InputDecoration(labelText: 'ID')),
-              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nombre')),
-              TextField(controller: addrCtrl, decoration: const InputDecoration(labelText: 'Dirección')),
+              _inputField(controller: idCtrl, label: 'ID'),
+              _inputField(controller: nameCtrl, label: 'Nombre'),
+              _inputField(controller: addrCtrl, label: 'Dirección'),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
           ElevatedButton(
             onPressed: () async {
-              final branch = Branch(id: idCtrl.text, name: nameCtrl.text, address: addrCtrl.text);
+              final branch = Branch(
+                id: idCtrl.text.trim(),
+                name: nameCtrl.text.trim(),
+                address: addrCtrl.text.trim(),
+              );
               await ref.read(addBranchProvider)(branch);
               if (context.mounted) Navigator.pop(context);
             },
             child: const Text('Guardar'),
-          )
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _inputField({
+    required TextEditingController controller,
+    required String label,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
       ),
     );
   }

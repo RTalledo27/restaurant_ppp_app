@@ -29,9 +29,3 @@ class OrderRemoteDataSource {
     );
   }
 }
-Future<void> createOrder(Order order) async {
-  await FirebaseFirestore.instance.collection('orders').add(order.toMap());
-}
-
-
-

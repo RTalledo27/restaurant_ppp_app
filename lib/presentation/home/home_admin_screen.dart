@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../routes/app_routes.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
+import '../routes/app_routes.dart';
 import '../../providers/order_providers.dart';
 import '../../providers/user_providers.dart';
 
@@ -15,25 +13,22 @@ class HomeAdminScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ordersAsync = ref.watch(orderListStreamProvider);
     final usersAsync = ref.watch(userListStreamProvider);
+
     final orders = ordersAsync.asData?.value ?? [];
     final users = usersAsync.asData?.value ?? [];
+
     final ordersToday = orders.where((o) => _isToday(o.createdAt)).length;
     final userCount = users.length;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFC45525), // Color naranja
-        title: const Text(
-          'Panel de Administración',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: Colors.white,
-          ),
-        ),
+        backgroundColor: const Color(0xFFC45525),
+        title: const Text('Panel de Administración',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
+            icon: const Icon(Icons.logout),
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
               if (context.mounted) {
@@ -42,146 +37,90 @@ class HomeAdminScreen extends ConsumerWidget {
             },
           ),
         ],
-
         elevation: 2,
       ),
       body: Column(
         children: [
-          // Banner superior
-          Container(
-            height: 150,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/admin_banner.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Container(
-              color: Colors.black.withOpacity(0.3),
-              padding: const EdgeInsets.all(16),
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'BIENVENIDO, ADMINISTRADOR',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          blurRadius: 5,
-                          color: Colors.black,
-                          offset: Offset(1, 1),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Gestión completa del restaurante',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Sección de estadísticas
+          _buildBanner(),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'ESTADÍSTICAS RÁPIDAS',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF333333),
-                  ),
-                ),
+                _sectionTitle('ESTADÍSTICAS RÁPIDAS'),
                 const SizedBox(height: 12),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildStatCard('Pedidos hoy', '$ordersToday', Icons.shopping_basket),
-                    _buildStatCard('Reservas', '0', Icons.calendar_today),
-                    _buildStatCard('Usuarios', '$userCount', Icons.people),
+                    _buildStatCard(context, 'Pedidos hoy', '$ordersToday', Icons.shopping_basket),
+                    _buildStatCard(context, 'Reservas', '0', Icons.calendar_today),
+                    _buildStatCard(context, 'Usuarios', '$userCount', Icons.people),
                   ],
                 ),
               ],
             ),
           ),
-
-          // Sección de gestión
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.background,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'GESTIÓN DEL RESTAURANTE',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Color(0xFF333333),
-                    ),
-                  ),
+                  _sectionTitle('GESTIÓN DEL RESTAURANTE'),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 1.5,
+                    child: GridView(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.5,
+                      ),
                       children: [
                         _buildFeatureCard(
-                          'Menú',
-                          Icons.restaurant_menu,
-                          const Color(0xFF4CAF50),
-                              () => Navigator.pushNamed(context, Routes.manageMenu),
+                          context,
+                          title: 'Menú',
+                          icon: Icons.restaurant_menu,
+                          color: const Color(0xFF4CAF50),
+                          onTap: () => Navigator.pushNamed(context, Routes.manageMenu),
                         ),
                         _buildFeatureCard(
-                          'Pedidos',
-                          Icons.shopping_cart,
-                          const Color(0xFF2196F3),
-                              () => Navigator.pushNamed(context, Routes.manageOrders),
+                          context,
+                          title: 'Pedidos',
+                          icon: Icons.shopping_cart,
+                          color: const Color(0xFF2196F3),
+                          onTap: () => Navigator.pushNamed(context, Routes.manageOrders),
                         ),
                         _buildFeatureCard(
-                          'Sucursales',
-                          Icons.store,
-                          const Color(0xFFFF9800),
-                              () => Navigator.pushNamed(context, Routes.manageBranches),
+                          context,
+                          title: 'Sucursales',
+                          icon: Icons.store,
+                          color: const Color(0xFFFF9800),
+                          onTap: () => Navigator.pushNamed(context, Routes.manageBranches),
                         ),
                         _buildFeatureCard(
-                          'Usuarios',
-                          Icons.people,
-                          const Color(0xFF9C27B0),
-                              () => Navigator.pushNamed(context, Routes.manageUsers),
+                          context,
+                          title: 'Usuarios',
+                          icon: Icons.people,
+                          color: const Color(0xFF9C27B0),
+                          onTap: () => Navigator.pushNamed(context, Routes.manageUsers),
                         ),
                         _buildFeatureCard(
-                          'Reportes',
-                          Icons.bar_chart,
-                          const Color(0xFFF44336),
-                              () => Navigator.pushNamed(context, Routes.reports),
+                          context,
+                          title: 'Reportes',
+                          icon: Icons.bar_chart,
+                          color: const Color(0xFFF44336),
+                          onTap: () => Navigator.pushNamed(context, Routes.reports),
                         ),
                         _buildFeatureCard(
-                          'Configuración',
-                          Icons.settings,
-                          const Color(0xFF607D8B),
-                              () => Navigator.pushNamed(context, Routes.settings),
+                          context,
+                          title: 'Configuración',
+                          icon: Icons.settings,
+                          color: const Color(0xFF607D8B),
+                          onTap: () => Navigator.pushNamed(context, Routes.settings),
                         ),
                       ],
                     ),
@@ -195,43 +134,41 @@ class HomeAdminScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
-            ),
-          ],
+  Widget _buildBanner() {
+    return Container(
+      height: 150,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/admin_banner.jpg'),
+          fit: BoxFit.cover,
         ),
-        child: Column(
+      ),
+      child: Container(
+        color: Colors.black.withOpacity(0.3),
+        padding: const EdgeInsets.all(16),
+        alignment: Alignment.center,
+        child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 30, color: const Color(0xFFC45525)),
-            const SizedBox(height: 8),
             Text(
-              value,
-              style: const TextStyle(
+              'BIENVENIDO, ADMINISTRADOR',
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF333333),
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    blurRadius: 5,
+                    color: Colors.black,
+                    offset: Offset(1, 1),
+                  )
+                ],
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 8),
             Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              'Gestión completa del restaurante',
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ],
         ),
@@ -239,16 +176,61 @@ class HomeAdminScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFeatureCard(String title, IconData icon, Color color, VoidCallback onTap) {
+  Widget _sectionTitle(String title) => Text(
+    title,
+    style: const TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+      color: Color(0xFF333333),
+    ),
+  );
+
+  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon) {
+    return Expanded(
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 30, color: const Color(0xFFC45525)),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF333333),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard(BuildContext context,
+      {required String title,
+        required IconData icon,
+        required Color color,
+        required VoidCallback onTap}) {
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
-
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

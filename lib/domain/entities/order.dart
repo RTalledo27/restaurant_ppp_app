@@ -9,8 +9,6 @@ class Order {
   final String status;
   final DateTime? createdAt;
   final Map<String, dynamic>? location;
-  final String paymentMethod; // <-- AGREGA ESTO
-
 
   Order({
     required this.id,
@@ -21,7 +19,5 @@ class Order {
     required this.status,
     this.createdAt,
     this.location,
-    required this.paymentMethod,
-
   });
 }
