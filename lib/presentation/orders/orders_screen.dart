@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../providers/cart_providers.dart';
 import '../routes/app_routes.dart';
 import 'dart:io';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 
 
 class OrdersScreen extends ConsumerWidget {
@@ -51,8 +53,28 @@ class OrdersScreen extends ConsumerWidget {
             final location = await Navigator.pushNamed(
               context,
               Routes.selectLocation,
-            );
+            )as LatLng?;
             if (location != null && context.mounted) {
+              final user = FirebaseAuth.instance.currentUser;
+              await FirebaseFirestore.instance.collection('orders').add({
+                'userId': user?.uid ?? '',
+                'items': cart
+                    .map((e) => {
+                  'id': e.item.id,
+                  'name': e.item.name,
+                  'quantity': e.quantity,
+                  'note': e.note,
+                  'price': e.item.price,
+                })
+                    .toList(),
+                'total': total,
+                'status': 'pending',
+                'createdAt': FieldValue.serverTimestamp(),
+                'location': {
+                  'lat': location.latitude,
+                  'lng': location.longitude,
+                },
+              });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Pedido confirmado')),
               );
