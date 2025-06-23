@@ -12,20 +12,43 @@ class MyOrdersScreen extends ConsumerWidget {
     final ordersAsync = ref.watch(userOrderListStreamProvider(uid));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis pedidos')),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        elevation: 2,
+        title: const Text('Mis pedidos', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: ordersAsync.when(
         data: (orders) => orders.isEmpty
             ? const Center(child: Text('Aún no tienes pedidos'))
             : ListView.builder(
+          padding: const EdgeInsets.all(16),
           itemCount: orders.length,
           itemBuilder: (context, i) {
             final order = orders[i];
-            return ListTile(
-              title: Text('Pedido ${order.id}'),
-              subtitle: Text('Estado: ${order.status}'),
-              trailing:
-              Text('\$${order.total.toStringAsFixed(2)}'),
-              onTap: () => _showDetail(context, order),
+            return Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                title: Text('Pedido #${order.id}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16)),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text('Estado: ${order.status}'),
+                    const SizedBox(height: 4),
+                    Text('Total: \$${order.total.toStringAsFixed(2)}'),
+                  ],
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () => _showDetail(context, order),
+              ),
             );
           },
         ),
@@ -38,6 +61,9 @@ class MyOrdersScreen extends ConsumerWidget {
   void _showDetail(BuildContext context, order) {
     showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (_) {
         return Padding(
           padding: const EdgeInsets.all(16),
@@ -45,18 +71,39 @@ class MyOrdersScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Pedido ${order.id}',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              ...order.items.map((i) => ListTile(
-                title: Text(i.name),
-                subtitle: Text('Cantidad: ${i.quantity}'),
-                trailing: Text('\$${i.total.toStringAsFixed(2)}'),
+              Text('Detalle del Pedido #${order.id}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 18)),
+              const SizedBox(height: 12),
+              ...order.items.map((i) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(i.name,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w500)),
+                          Text('Cantidad: ${i.quantity}',
+                              style: const TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    Text('\$${i.total.toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
               )),
+              const Divider(height: 24),
+              Text('Total: \$${order.total.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 8),
-              Text('Total: \$${order.total.toStringAsFixed(2)}'),
-              const SizedBox(height: 8),
-              Text('Estado: ${order.status}'),
+              Text('Estado: ${order.status}',
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary)),
             ],
           ),
         );

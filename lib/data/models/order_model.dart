@@ -6,17 +6,20 @@ class OrderModel extends Order {
   OrderModel({
     required super.id,
     required super.userId,
+    required super.branchId,
     required super.items,
     required super.total,
     required super.status,
     super.createdAt,
     super.location,
+    required super.paymentMethod,
   });
 
   factory OrderModel.fromMap(Map<String, dynamic> map, String id) {
     return OrderModel(
       id: id,
       userId: map['userId'] as String? ?? '',
+      branchId: map['branchId'] as String? ?? '',
       items: (map['items'] as List<dynamic>? ?? [])
           .map((e) => OrderItem(
         id: e['id'] as String? ?? '',
@@ -30,12 +33,15 @@ class OrderModel extends Order {
       status: map['status'] as String? ?? 'pending',
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
       location: map['location'] as Map<String, dynamic>?,
+      paymentMethod: map['paymentMethod'] as String? ?? 'efectivo',
+
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
+      'branchId': branchId,
       'items': items
           .map((e) => {
         'id': e.id,
@@ -49,6 +55,8 @@ class OrderModel extends Order {
       'status': status,
       'createdAt': createdAt,
       'location': location,
+      'paymentMethod': paymentMethod,
+
     };
   }
 }

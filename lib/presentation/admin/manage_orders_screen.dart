@@ -19,8 +19,9 @@ class ManageOrdersScreen extends ConsumerWidget {
             final order = orders[i];
             return ListTile(
               title: Text('Pedido ${order.id}'),
-              subtitle: Text('Estado: ${order.status}'),
+              subtitle: Text('Sucursal: ${order.branchId}\nEstado: ${order.status}'),
               trailing: Text('\$${order.total.toStringAsFixed(2)}'),
+              isThreeLine: true,
               onTap: () => _showDetail(context, ref, order),
             );
           },
@@ -43,6 +44,8 @@ class ManageOrdersScreen extends ConsumerWidget {
             children: [
               Text('Pedido ${order.id}',
                   style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text('Sucursal: ${order.branchId}'),
               const SizedBox(height: 8),
               ...order.items.map((i) => ListTile(
                 title: Text(i.name),
