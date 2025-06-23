@@ -2,11 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../routes/app_routes.dart';
 
-class HomeAdminScreen extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+
+import '../../providers/order_providers.dart';
+import '../../providers/user_providers.dart';
+
+class HomeAdminScreen extends ConsumerWidget {
   const HomeAdminScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ordersAsync = ref.watch(orderListStreamProvider);
+    final usersAsync = ref.watch(userListStreamProvider);
+    final orders = ordersAsync.asData?.value ?? [];
+    final users = usersAsync.asData?.value ?? [];
+    final ordersToday = orders.where((o) => _isToday(o.createdAt)).length;
+    final userCount = users.length;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -22,9 +34,15 @@ class HomeAdminScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () => FirebaseAuth.instance.signOut(),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                Navigator.pushReplacementNamed(context, '/login');
+              }
+            },
           ),
         ],
+
         elevation: 2,
       ),
       body: Column(
@@ -90,9 +108,9 @@ class HomeAdminScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildStatCard('Pedidos hoy', '24', Icons.shopping_basket),
-                    _buildStatCard('Reservas', '8', Icons.calendar_today),
-                    _buildStatCard('Usuarios', '142', Icons.people),
+                    _buildStatCard('Pedidos hoy', '$ordersToday', Icons.shopping_basket),
+                    _buildStatCard('Reservas', '0', Icons.calendar_today),
+                    _buildStatCard('Usuarios', '$userCount', Icons.people),
                   ],
                 ),
               ],
@@ -255,4 +273,10 @@ class HomeAdminScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+bool _isToday(DateTime? date) {
+  if (date == null) return false;
+  final now = DateTime.now();
+  return date.year == now.year && date.month == now.month && date.day == now.day;
 }
