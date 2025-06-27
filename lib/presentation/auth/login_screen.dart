@@ -5,6 +5,8 @@ import '../widgets/logo/rokos_logo.dart';
 import '../widgets/rounded_field.dart';
 import '../widgets/primary_button.dart';
 import '../routes/app_routes.dart';
+import '../delivery/delivery_orders_screen.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends HookWidget {
@@ -66,10 +68,16 @@ class LoginScreen extends HookWidget {
 
         // Navegar a la pantalla correspondiente según el rol
         if (context.mounted) {
+          final route = switch (userRole) {
+            'admin' => Routes.homeAdmin,
+            'delivery' => Routes.deliveryOrders,
+            _ => Routes.homeUser,
+          };
           Navigator.pushNamedAndRemoveUntil(
             context,
-            userRole == 'admin' ? Routes.homeAdmin : Routes.homeUser,
-                (route) => false,
+            route,
+
+            (route) => false,
           );
         }
       } on FirebaseAuthException catch (e) {

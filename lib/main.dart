@@ -22,6 +22,8 @@ import 'presentation/admin/reports_screen.dart';
 import 'presentation/admin/settings_screen.dart';
 import 'providers/ui_providers.dart';
 
+import 'presentation/delivery/delivery_orders_screen.dart';
+
 import 'presentation/orders/select_location_screen.dart';
 
 
@@ -62,6 +64,7 @@ class MyApp extends StatelessWidget {
         Routes.myOrders : (_) => const MyOrdersScreen(),
 
 
+        Routes.deliveryOrders: (_) => const DeliveryOrdersScreen(),
         Routes.manageOrders: (_) => const ManageOrdersScreen(),
         Routes.manageUsers: (_) => const ManageUsersScreen(),
         Routes.reports: (_) => const ReportsScreen(),

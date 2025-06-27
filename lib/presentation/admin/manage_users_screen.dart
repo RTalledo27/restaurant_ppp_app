@@ -58,6 +58,8 @@ class ManageUsersScreen extends ConsumerWidget {
                       items: const [
                         DropdownMenuItem(value: 'user', child: Text('Usuario')),
                         DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                        DropdownMenuItem(value: 'delivery', child: Text('Repartidor')),
+
                       ],
                     ),
                   ],

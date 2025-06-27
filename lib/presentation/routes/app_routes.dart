@@ -12,6 +12,7 @@ class Routes {
    static const manageOrders = '/manage-orders';
    static const manageUsers = '/manage-users';
    static const reports = '/reports';
+   static const deliveryOrders = '/delivery-orders';
    static const settings = '/settings';
    static const selectLocation = '/select-location';
 }
