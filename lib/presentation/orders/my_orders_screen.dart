@@ -65,8 +65,55 @@ class MyOrdersScreen extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) {
-        return Padding(
+      builder: (ctx) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final orderAsync = ref.watch(orderStreamProvider(order.id));
+            return orderAsync.when(
+              data: (liveOrder) => _OrderDetailContent(order: liveOrder),
+              loading: () => const Padding(
+                padding: EdgeInsets.all(32),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (e, _) => Padding(
+                padding: const EdgeInsets.all(32),
+                child: Center(child: Text('Error: $e')),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _OrderDetailContent extends ConsumerStatefulWidget {
+  final dynamic order;
+  const _OrderDetailContent({required this.order});
+
+  @override
+  ConsumerState<_OrderDetailContent> createState() => _OrderDetailContentState();
+}
+
+class _OrderDetailContentState extends ConsumerState<_OrderDetailContent> {
+  GoogleMapController? _controller;
+
+  @override
+  void didUpdateWidget(covariant _OrderDetailContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.order.deliveryLocation != null && _controller != null) {
+      final pos = LatLng(
+        (widget.order.deliveryLocation['lat'] as num).toDouble(),
+        (widget.order.deliveryLocation['lng'] as num).toDouble(),
+      );
+      _controller!.animateCamera(CameraUpdate.newLatLng(pos));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final order = widget.order;
+    return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -109,6 +156,8 @@ class MyOrdersScreen extends ConsumerWidget {
                 SizedBox(
                   height: 200,
                   child: GoogleMap(
+                    key: ValueKey(order.deliveryLocation),
+                    onMapCreated: (c) => _controller = c,
                     initialCameraPosition: CameraPosition(
                       target: LatLng(
                         (order.deliveryLocation['lat'] as num).toDouble(),
@@ -139,7 +188,5 @@ class MyOrdersScreen extends ConsumerWidget {
             ],
           ),
         );
-      },
-    );
   }
 }

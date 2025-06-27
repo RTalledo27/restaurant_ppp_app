@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../providers/order_providers.dart';
 import '../routes/app_routes.dart';
@@ -126,102 +129,146 @@ class DeliveryOrdersScreen extends ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       isScrollControlled: true,
-      builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-          child: Wrap(
-            runSpacing: 12,
+      builder: (_) => _DeliveryOrderDetailSheet(order: order),
+    );
+  }
+}
+
+class _DeliveryOrderDetailSheet extends ConsumerStatefulWidget {
+  final Order order;
+  const _DeliveryOrderDetailSheet({required this.order});
+
+  @override
+  ConsumerState<_DeliveryOrderDetailSheet> createState() => _DeliveryOrderDetailSheetState();
+}
+
+class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailSheet> {
+  StreamSubscription<Position>? _sub;
+  bool _tracking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (widget.order.deliveryId == uid && widget.order.status != 'completed') {
+      _startTracking();
+    }
+  }
+
+  Future<void> _startTracking() async {
+    _sub?.cancel();
+    _sub = Geolocator.getPositionStream().listen((pos) {
+      ref.read(updateDeliveryLocationProvider)(widget.order.id, {
+        'lat': pos.latitude,
+        'lng': pos.longitude,
+      });
+    });
+    setState(() => _tracking = true);
+  }
+
+  Future<void> _stopTracking() async {
+    await _sub?.cancel();
+    _sub = null;
+    setState(() => _tracking = false);
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final order = widget.order;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+      child: Wrap(
+        runSpacing: 12,
+        children: [
+          Center(
+            child: Container(
+              height: 4,
+              width: 40,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          Text(
+            'Pedido #${order.id}',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 4),
+          Text('Sucursal: ${order.branchId}'),
+          const Divider(),
+          ...order.items.map(
+                (i) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(i.name),
+              subtitle: Text('Cantidad: ${i.quantity}'),
+              trailing: Text('\$${i.total.toStringAsFixed(2)}'),
+            ),
+          ),
+          const Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Center(
-                child: Container(
-                  height: 4,
-                  width: 40,
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+              const Text(
+                'Total:',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'Pedido #${order.id}',
-                style: Theme.of(context).textTheme.titleLarge,
+                '\$${order.total.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 4),
-              Text('Sucursal: ${order.branchId}'),
-              const Divider(),
-              ...order.items.map(
-                    (i) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(i.name),
-                  subtitle: Text('Cantidad: ${i.quantity}'),
-                  trailing: Text('\$${i.total.toStringAsFixed(2)}'),
-                ),
-              ),
-              const Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Total:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '\$${order.total.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Cambiar estado:',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              DropdownButtonFormField<String>(
-                value: order.status,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                ),
-                onChanged: (v) {
-                  if (v != null) {
-                    ref.read(updateOrderStatusProvider)(order.id, v);
-                    Navigator.pop(context);
-                  }
-                },
-                items: const [
-                  DropdownMenuItem(value: 'pending', child: Text('Pendiente')),
-                  DropdownMenuItem(value: 'in_progress', child: Text('En progreso')),
-                  DropdownMenuItem(value: 'completed', child: Text('Completado')),
-                ],
-              ),
-              if ((order.deliveryId ?? '').isEmpty)
-                ElevatedButton(
-                  onPressed: () {
-                    final uid = FirebaseAuth.instance.currentUser?.uid;
-                    if (uid != null) {
-                      ref.read(assignOrderProvider)(order.id, uid);
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text('Tomar pedido'),
-                )
-              else if (order.deliveryId == FirebaseAuth.instance.currentUser?.uid &&
-                  order.status != 'completed')
-                ElevatedButton(
-                  onPressed: () async {
-                    final pos = await Geolocator.getCurrentPosition();
-                    await ref.read(updateDeliveryLocationProvider)(order.id, {
-                      'lat': pos.latitude,
-                      'lng': pos.longitude,
-                    });
-                  },
-                  child: const Text('Actualizar ubicación'),
-                ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 12),
+          Text(
+            'Cambiar estado:',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          DropdownButtonFormField<String>(
+            value: order.status,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12),
+            ),
+            onChanged: (v) {
+              if (v != null) {
+                ref.read(updateOrderStatusProvider)(order.id, v);
+                Navigator.pop(context);
+              }
+            },
+            items: const [
+              DropdownMenuItem(value: 'pending', child: Text('Pendiente')),
+              DropdownMenuItem(value: 'in_progress', child: Text('En progreso')),
+              DropdownMenuItem(value: 'completed', child: Text('Completado')),
+            ],
+          ),
+          if ((order.deliveryId ?? '').isEmpty)
+            ElevatedButton(
+              onPressed: () async {
+                final uid = FirebaseAuth.instance.currentUser?.uid;
+                if (uid != null) {
+                  await ref.read(assignOrderProvider)(order.id, uid);
+                  await _startTracking();
+                }
+              },
+              child: const Text('Tomar pedido'),
+            )
+          else if (order.deliveryId == FirebaseAuth.instance.currentUser?.uid &&
+              order.status != 'completed')
+            ElevatedButton(
+              onPressed: _tracking ? _stopTracking : _startTracking,
+              child: Text(_tracking ? 'Detener seguimiento' : 'Iniciar seguimiento'),
+            ),
+        ],
+      ),
     );
   }
 }

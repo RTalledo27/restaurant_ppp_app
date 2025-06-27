@@ -9,6 +9,8 @@ import '../domain/usecases/update_order_status.dart';
 import '../domain/usecases/assign_order_to_delivery.dart';
 import '../domain/usecases/update_delivery_location.dart';
 import 'menu_providers.dart';
+import '../domain/usecases/get_order.dart';
+
 
 final orderRemoteDataSourceProvider = Provider<OrderRemoteDataSource>((ref) {
   return OrderRemoteDataSource(ref.read(firestoreProvider));
@@ -47,4 +49,13 @@ final assignOrderProvider = Provider<AssignOrderToDelivery>((ref) {
 
 final updateDeliveryLocationProvider = Provider<UpdateDeliveryLocation>((ref) {
   return UpdateDeliveryLocation(ref.read(orderRepositoryProvider));
+});
+
+
+final getOrderProvider = Provider<GetOrder>((ref) {
+  return GetOrder(ref.read(orderRepositoryProvider));
+});
+
+final orderStreamProvider = StreamProvider.family.autoDispose((ref, String id) {
+  return ref.read(getOrderProvider)(id);
 });

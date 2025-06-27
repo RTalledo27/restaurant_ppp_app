@@ -6,4 +6,6 @@ abstract class OrderRepository {
   Future<void> updateOrderStatus(String id, String status);
   Future<void> assignOrder(String id, String deliveryId);
   Future<void> updateDeliveryLocation(String id, Map<String, dynamic> location);
+  Stream<Order> watchOrder(String id);
+
 }

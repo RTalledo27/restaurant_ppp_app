@@ -32,4 +32,11 @@ class OrderRepositoryImpl implements OrderRepository {
   Future<void> updateDeliveryLocation(String id, Map<String, dynamic> location) {
     return remote.updateDeliveryLocation(id, location);
   }
+
+  @override
+  Stream<Order> watchOrder(String id) {
+    return remote.watchOrder(id).map((o) => o as Order);
+  }
 }
+
+

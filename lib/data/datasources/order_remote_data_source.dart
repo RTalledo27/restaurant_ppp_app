@@ -30,6 +30,13 @@ class OrderRemoteDataSource {
     });
   }
 
+  Stream<OrderModel> watchOrder(String id) {
+    return firestore.collection('orders').doc(id).snapshots().map(
+          (doc) => OrderModel.fromMap(doc.data()!, doc.id),
+    );
+  }
+
+
   Stream<List<OrderModel>> watchOrdersByUser(String userId) {
     return firestore
         .collection('orders')
