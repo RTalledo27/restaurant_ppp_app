@@ -20,9 +20,8 @@ import 'presentation/admin/manage_orders_screen.dart';
 import 'presentation/admin/manage_users_screen.dart';
 import 'presentation/admin/reports_screen.dart';
 import 'presentation/admin/settings_screen.dart';
-import 'providers/ui_providers.dart';
-
 import 'presentation/delivery/delivery_orders_screen.dart';
+import 'providers/ui_providers.dart';
 
 import 'presentation/orders/select_location_screen.dart';
 

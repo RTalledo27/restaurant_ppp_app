@@ -17,6 +17,19 @@ class OrderRemoteDataSource {
     return firestore.collection('orders').doc(id).update({'status': status});
   }
 
+  Future<void> assignOrder(String id, String deliveryId) {
+    return firestore.collection('orders').doc(id).update({
+      'deliveryId': deliveryId,
+      'status': 'in_progress',
+    });
+  }
+
+  Future<void> updateDeliveryLocation(String id, Map<String, dynamic> location) {
+    return firestore.collection('orders').doc(id).update({
+      'deliveryLocation': location,
+    });
+  }
+
   Stream<List<OrderModel>> watchOrdersByUser(String userId) {
     return firestore
         .collection('orders')

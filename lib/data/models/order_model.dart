@@ -13,6 +13,8 @@ class OrderModel extends Order {
     required super.status,
     super.createdAt,
     super.location,
+    super.deliveryId,
+    super.deliveryLocation,
   });
 
   factory OrderModel.fromMap(Map<String, dynamic> map, String id) {
@@ -34,6 +36,8 @@ class OrderModel extends Order {
       status: map['status'] as String? ?? 'pending',
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
       location: map['location'] as Map<String, dynamic>?,
+      deliveryId: map['deliveryId'] as String?,
+      deliveryLocation: map['deliveryLocation'] as Map<String, dynamic>?,
     );
   }
 
@@ -55,6 +59,8 @@ class OrderModel extends Order {
       'status': status,
       'createdAt': createdAt,
       'location': location,
+      'deliveryId': deliveryId,
+      'deliveryLocation': deliveryLocation,
     };
   }
 }

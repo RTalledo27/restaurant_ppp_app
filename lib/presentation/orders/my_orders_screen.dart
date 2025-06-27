@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../providers/order_providers.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MyOrdersScreen extends ConsumerWidget {
   const MyOrdersScreen({super.key});
@@ -104,6 +105,37 @@ class MyOrdersScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               Text('Estado: ${order.status}',
                   style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+              if (order.deliveryLocation != null)
+                SizedBox(
+                  height: 200,
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(
+                        (order.deliveryLocation['lat'] as num).toDouble(),
+                        (order.deliveryLocation['lng'] as num).toDouble(),
+                      ),
+                      zoom: 14,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId('delivery'),
+                        position: LatLng(
+                          (order.deliveryLocation['lat'] as num).toDouble(),
+                          (order.deliveryLocation['lng'] as num).toDouble(),
+                        ),
+                      ),
+                      if (order.location != null)
+                        Marker(
+                          markerId: const MarkerId('dest'),
+                          position: LatLng(
+                            (order.location['lat'] as num).toDouble(),
+                            (order.location['lng'] as num).toDouble(),
+                          ),
+                        ),
+                    },
+                  ),
+                ),
+
             ],
           ),
         );

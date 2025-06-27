@@ -22,4 +22,14 @@ class OrderRepositoryImpl implements OrderRepository {
   Future<void> updateOrderStatus(String id, String status) {
     return remote.updateOrderStatus(id, status);
   }
+
+  @override
+  Future<void> assignOrder(String id, String deliveryId) {
+    return remote.assignOrder(id, deliveryId);
+  }
+
+  @override
+  Future<void> updateDeliveryLocation(String id, Map<String, dynamic> location) {
+    return remote.updateDeliveryLocation(id, location);
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../providers/order_providers.dart';
 import '../routes/app_routes.dart';
@@ -194,6 +195,29 @@ class DeliveryOrdersScreen extends ConsumerWidget {
                   DropdownMenuItem(value: 'completed', child: Text('Completado')),
                 ],
               ),
+              if ((order.deliveryId ?? '').isEmpty)
+                ElevatedButton(
+                  onPressed: () {
+                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                    if (uid != null) {
+                      ref.read(assignOrderProvider)(order.id, uid);
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('Tomar pedido'),
+                )
+              else if (order.deliveryId == FirebaseAuth.instance.currentUser?.uid &&
+                  order.status != 'completed')
+                ElevatedButton(
+                  onPressed: () async {
+                    final pos = await Geolocator.getCurrentPosition();
+                    await ref.read(updateDeliveryLocationProvider)(order.id, {
+                      'lat': pos.latitude,
+                      'lng': pos.longitude,
+                    });
+                  },
+                  child: const Text('Actualizar ubicación'),
+                ),
             ],
           ),
         );

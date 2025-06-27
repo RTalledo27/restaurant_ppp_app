@@ -101,7 +101,7 @@ class HomeClientScreen extends ConsumerWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
-                    'assets/UI/Proyecto PPP_page-0001.jpg',
+                    'assets/UI/Historia de Instagram Restaurante a Domicilio.jpg',
                     width: double.infinity,
                     height: 180,
                     fit: BoxFit.cover,

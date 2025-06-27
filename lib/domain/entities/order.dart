@@ -9,6 +9,9 @@ class Order {
   final String status;
   final DateTime? createdAt;
   final Map<String, dynamic>? location;
+  final String? deliveryId;
+  final Map<String, dynamic>? deliveryLocation;
+
 
   Order({
     required this.id,
@@ -19,5 +22,7 @@ class Order {
     required this.status,
     this.createdAt,
     this.location,
+    this.deliveryId,
+    this.deliveryLocation,
   });
 }

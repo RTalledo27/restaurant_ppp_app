@@ -73,11 +73,11 @@ class LoginScreen extends HookWidget {
             'delivery' => Routes.deliveryOrders,
             _ => Routes.homeUser,
           };
+
           Navigator.pushNamedAndRemoveUntil(
             context,
             route,
-
-            (route) => false,
+                (route) => false,
           );
         }
       } on FirebaseAuthException catch (e) {
