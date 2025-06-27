@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../providers/order_providers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../routes/app_routes.dart';
 
 class MyOrdersScreen extends ConsumerWidget {
   const MyOrdersScreen({super.key});
@@ -184,9 +185,21 @@ class _OrderDetailContentState extends ConsumerState<_OrderDetailContent> {
                     },
                   ),
                 ),
+              if (order.deliveryLocation != null)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      Routes.trackOrder,
+                      arguments: order.id,
+                    ),
+                    child: const Text('Ver en mapa'),
+                  ),
+                ),
 
             ],
           ),
-        );
+    );
   }
 }

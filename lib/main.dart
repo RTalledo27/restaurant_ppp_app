@@ -15,6 +15,7 @@ import 'presentation/orders/orders_screen.dart';
 import 'presentation/admin/manage_menu_screen.dart';
 import 'presentation/admin/manage_branches_screen.dart';
 import 'presentation/orders/my_orders_screen.dart';
+import 'presentation/orders/track_order_screen.dart';
 
 import 'presentation/admin/manage_orders_screen.dart';
 import 'presentation/admin/manage_users_screen.dart';
@@ -61,6 +62,11 @@ class MyApp extends StatelessWidget {
         Routes.manageBranches: (_) => const ManageBranchesScreen(),
 
         Routes.myOrders : (_) => const MyOrdersScreen(),
+
+        Routes.trackOrder: (ctx) {
+          final id = ModalRoute.of(ctx)!.settings.arguments as String;
+          return TrackOrderScreen(orderId: id);
+        },
 
 
         Routes.deliveryOrders: (_) => const DeliveryOrdersScreen(),

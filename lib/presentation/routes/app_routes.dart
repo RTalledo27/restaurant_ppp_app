@@ -15,4 +15,6 @@ class Routes {
    static const deliveryOrders = '/delivery-orders';
    static const settings = '/settings';
    static const selectLocation = '/select-location';
+   static const trackOrder = '/track-order';
+
 }
