@@ -93,113 +93,142 @@ class _OrderDetailContent extends ConsumerStatefulWidget {
   const _OrderDetailContent({required this.order});
 
   @override
-  ConsumerState<_OrderDetailContent> createState() => _OrderDetailContentState();
+  ConsumerState<_OrderDetailContent> createState() =>
+      _OrderDetailContentState();
 }
 
 class _OrderDetailContentState extends ConsumerState<_OrderDetailContent> {
   GoogleMapController? _controller;
 
   @override
-  void didUpdateWidget(covariant _OrderDetailContent oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.order.deliveryLocation != null && _controller != null) {
-      final pos = LatLng(
-        (widget.order.deliveryLocation['lat'] as num).toDouble(),
-        (widget.order.deliveryLocation['lng'] as num).toDouble(),
-      );
-      _controller!.animateCamera(CameraUpdate.newLatLng(pos));
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final order = widget.order;
-    return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Detalle del Pedido #${order.id}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18)),
-              const SizedBox(height: 12),
-              ...order.items.map((i) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(i.name,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w500)),
-                          Text('Cantidad: ${i.quantity}',
-                              style: const TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                    Text('\$${i.total.toStringAsFixed(2)}',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              )),
-              const Divider(height: 24),
-              Text('Total: \$${order.total.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 8),
-              Text('Estado: ${order.status}',
-                  style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-              if (order.deliveryLocation != null)
-                SizedBox(
-                  height: 200,
-                  child: GoogleMap(
-                    key: ValueKey(order.deliveryLocation),
-                    onMapCreated: (c) => _controller = c,
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(
-                        (order.deliveryLocation['lat'] as num).toDouble(),
-                        (order.deliveryLocation['lng'] as num).toDouble(),
-                      ),
-                      zoom: 14,
-                    ),
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId('delivery'),
-                        position: LatLng(
-                          (order.deliveryLocation['lat'] as num).toDouble(),
-                          (order.deliveryLocation['lng'] as num).toDouble(),
-                        ),
-                      ),
-                      if (order.location != null)
-                        Marker(
-                          markerId: const MarkerId('dest'),
-                          position: LatLng(
-                            (order.location['lat'] as num).toDouble(),
-                            (order.location['lng'] as num).toDouble(),
-                          ),
-                        ),
-                    },
-                  ),
-                ),
-              if (order.deliveryLocation != null)
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.pushNamed(
-                      context,
-                      Routes.trackOrder,
-                      arguments: order.id,
-                    ),
-                    child: const Text('Ver en mapa'),
-                  ),
-                ),
 
-            ],
-          ),
+    // 🔥 ref.listen para escuchar cambios en tiempo real
+    ref.listen(
+      orderStreamProvider(order.id),
+          (previous, next) {
+        next.whenData((updatedOrder) {
+          final loc = updatedOrder.deliveryLocation;
+          if (loc != null && _controller != null) {
+            final newPos = LatLng(
+              (loc['lat'] as num).toDouble(),
+              (loc['lng'] as num).toDouble(),
+            );
+            _controller!.animateCamera(CameraUpdate.newLatLng(newPos));
+          }
+        });
+      },
+    );
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Detalle del Pedido #${order.id}',
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 18)),
+          const SizedBox(height: 12),
+          ...order.items.map((i) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(i.name,
+                          style:
+                          const TextStyle(fontWeight: FontWeight.w500)),
+                      Text('Cantidad: ${i.quantity}',
+                          style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+                Text('\$${i.total.toStringAsFixed(2)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          )),
+          const Divider(height: 24),
+          Text('Total: \$${order.total.toStringAsFixed(2)}',
+              style:
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          Text('Estado: ${order.status}',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary)),
+          if (order.deliveryLocation != null)
+            SizedBox(
+              height: 200,
+              child: GoogleMap(
+                key: ValueKey(order.deliveryLocation),
+                onMapCreated: (c) => _controller = c,
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                    (order.deliveryLocation['lat'] as num).toDouble(),
+                    (order.deliveryLocation['lng'] as num).toDouble(),
+                  ),
+                  zoom: 14,
+                ),
+                markers: {
+                  Marker(
+                    markerId: const MarkerId('delivery'),
+                    position: LatLng(
+                      (order.deliveryLocation['lat'] as num).toDouble(),
+                      (order.deliveryLocation['lng'] as num).toDouble(),
+                    ),
+                  ),
+                  if (order.location != null)
+                    Marker(
+                      markerId: const MarkerId('dest'),
+                      position: LatLng(
+                        (order.location['lat'] as num).toDouble(),
+                        (order.location['lng'] as num).toDouble(),
+                      ),
+                    ),
+                },
+              ),
+            ),
+          // --- BOTÓN DE SEGUIMIENTO ---
+          if (order.status == 'in_progress' && order.deliveryId != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.location_on),
+                label: const Text('Ver seguimiento'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context); // Cierra el modal
+                  Navigator.pushNamed(
+                    context,
+                    Routes.trackOrder,
+                    arguments: order.id,
+                  );
+                },
+              ),
+            ),
+          if (order.status != 'in_progress')
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                'Seguimiento disponible cuando el pedido esté en camino.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

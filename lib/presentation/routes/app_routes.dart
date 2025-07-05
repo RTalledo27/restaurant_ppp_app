@@ -16,5 +16,7 @@ class Routes {
    static const settings = '/settings';
    static const selectLocation = '/select-location';
    static const trackOrder = '/track-order';
+   static const profile = '/profile';
+
 
 }

@@ -7,6 +7,8 @@ import '../domain/usecases/get_branches.dart';
 import '../domain/usecases/add_branch.dart';
 import 'menu_providers.dart';
 
+final branchInitProvider = StateProvider<bool>((ref) => false);
+
 
 final branchRemoteDataSourceProvider = Provider<BranchRemoteDataSource>((ref) {
   return BranchRemoteDataSource(ref.read(firestoreProvider));

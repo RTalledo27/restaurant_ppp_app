@@ -1,11 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import '../../providers/order_providers.dart';
 import '../routes/app_routes.dart';
 import '../../domain/entities/order.dart';
@@ -156,8 +153,33 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
   }
 
   Future<void> _startTracking() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Permiso de ubicación denegado')),
+          );
+        }
+        return;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Permiso de ubicación denegado permanentemente. Actívalo en Ajustes.')),
+        );
+      }
+      return;
+    }
     _sub?.cancel();
-    _sub = Geolocator.getPositionStream().listen((pos) {
+    _sub = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+      ),
+    ).listen((pos) {
       ref.read(updateDeliveryLocationProvider)(widget.order.id, {
         'lat': pos.latitude,
         'lng': pos.longitude,
@@ -181,6 +203,7 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
@@ -261,8 +284,7 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
               },
               child: const Text('Tomar pedido'),
             )
-          else if (order.deliveryId == FirebaseAuth.instance.currentUser?.uid &&
-              order.status != 'completed')
+          else if (order.deliveryId == uid && order.status != 'completed')
             ElevatedButton(
               onPressed: _tracking ? _stopTracking : _startTracking,
               child: Text(_tracking ? 'Detener seguimiento' : 'Iniciar seguimiento'),

@@ -17,8 +17,8 @@ class _TrackOrderScreenState extends ConsumerState<TrackOrderScreen> {
   final List<LatLng> _path = [];
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    // Aquí SÍ puedes usar ref.listen:
     ref.listen(orderStreamProvider(widget.orderId), (prev, next) {
       next.whenOrNull(data: (order) {
         final loc = order.deliveryLocation;
@@ -39,19 +39,7 @@ class _TrackOrderScreenState extends ConsumerState<TrackOrderScreen> {
         _controller?.animateCamera(CameraUpdate.newLatLng(pos));
       });
     });
-  }
 
-  @override
-  void didUpdateWidget(covariant TrackOrderScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.orderId != widget.orderId) {
-      _controller = null;
-      _path.clear();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final orderAsync = ref.watch(orderStreamProvider(widget.orderId));
 
     return Scaffold(

@@ -3,6 +3,7 @@ import 'package:restaurant_ppp_app/presentation/auth/recover_screen.dart';
 import 'firebase_options.dart'; // 👈 Agregado (lo genera `flutterfire configure`)
 import 'package:firebase_core/firebase_core.dart'; // 👈 Agregado
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../presentation/profile/profile_screen.dart';
 
 import 'presentation/routes/app_routes.dart';
 import 'presentation/themes/app_theme.dart';
@@ -67,6 +68,8 @@ class MyApp extends StatelessWidget {
           final id = ModalRoute.of(ctx)!.settings.arguments as String;
           return TrackOrderScreen(orderId: id);
         },
+
+        Routes.profile: (_) => const ProfileScreen(),
 
 
         Routes.deliveryOrders: (_) => const DeliveryOrdersScreen(),
