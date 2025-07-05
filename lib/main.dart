@@ -4,6 +4,7 @@ import 'firebase_options.dart'; // 👈 Agregado (lo genera `flutterfire configu
 import 'package:firebase_core/firebase_core.dart'; // 👈 Agregado
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../presentation/profile/profile_screen.dart';
+import 'services/notification_service.dart';
 
 import 'presentation/routes/app_routes.dart';
 import 'presentation/themes/app_theme.dart';
@@ -32,6 +33,8 @@ import 'presentation/orders/select_location_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await NotificationService.init();
+
   runApp(
     const ProviderScope(
       child: MyApp(),
