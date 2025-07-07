@@ -4,15 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../providers/order_providers.dart';
+import '../../providers/enhanced_order_providers.dart';
 import '../routes/app_routes.dart';
-import '../../domain/entities/order.dart';
 
 class DeliveryOrdersScreen extends ConsumerWidget {
   const DeliveryOrdersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ordersAsync = ref.watch(orderListStreamProvider);
+    final ordersAsync = ref.watch(enhancedOrderListStreamProvider);
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
@@ -88,7 +88,6 @@ class DeliveryOrdersScreen extends ConsumerWidget {
                   ],
                 ),
               );
-
               if (shouldLogout == true) {
                 await FirebaseAuth.instance.signOut();
                 if (context.mounted) {
@@ -264,10 +263,10 @@ class DeliveryOrdersScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOrdersList(BuildContext context, WidgetRef ref, List<Order> orders) {
+  Widget _buildOrdersList(BuildContext context, WidgetRef ref, List<EnhancedOrder> orders) {
     return RefreshIndicator(
       onRefresh: () async {
-        ref.invalidate(orderListStreamProvider);
+        ref.invalidate(enhancedOrderListStreamProvider);
       },
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -280,7 +279,7 @@ class DeliveryOrdersScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOrderCard(BuildContext context, WidgetRef ref, Order order, int index) {
+  Widget _buildOrderCard(BuildContext context, WidgetRef ref, EnhancedOrder order, int index) {
     final user = FirebaseAuth.instance.currentUser;
     final isMyOrder = order.deliveryId == user?.uid;
     final isAvailable = order.deliveryId?.isEmpty ?? true;
@@ -350,6 +349,15 @@ class DeliveryOrdersScreen extends ConsumerWidget {
                                 color: Colors.grey[600],
                               ),
                             ),
+                            // Información básica del cliente
+                            if (order.customerName != null && order.customerName!.isNotEmpty)
+                              Text(
+                                'Cliente: ${order.customerName}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -387,9 +395,7 @@ class DeliveryOrdersScreen extends ConsumerWidget {
                         ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
-
                   // Order Info
                   Row(
                     children: [
@@ -428,7 +434,7 @@ class DeliveryOrdersScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          '\$${order.total.toStringAsFixed(2)}',
+                          'S/.${order.total.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -438,9 +444,7 @@ class DeliveryOrdersScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 12),
-
                   // Status and Action
                   Row(
                     children: [
@@ -537,7 +541,7 @@ class DeliveryOrdersScreen extends ConsumerWidget {
     }
   }
 
-  void _showDetail(BuildContext context, WidgetRef ref, Order order) {
+  void _showDetail(BuildContext context, WidgetRef ref, EnhancedOrder order) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -548,7 +552,8 @@ class DeliveryOrdersScreen extends ConsumerWidget {
 }
 
 class _DeliveryOrderDetailSheet extends ConsumerStatefulWidget {
-  final Order order;
+  final EnhancedOrder order;
+
   const _DeliveryOrderDetailSheet({required this.order});
 
   @override
@@ -581,6 +586,7 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
         return;
       }
     }
+
     if (permission == LocationPermission.deniedForever) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -602,6 +608,7 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
         'lng': pos.longitude,
       });
     });
+
     setState(() => _tracking = true);
   }
 
@@ -615,6 +622,62 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
   void dispose() {
     _sub?.cancel();
     super.dispose();
+  }
+
+  Widget _buildCustomerInfoRow(IconData icon, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 20,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (label == 'Teléfono' && value != 'No disponible')
+            IconButton(
+              onPressed: () {
+                // Aquí puedes agregar funcionalidad para llamar
+                // launch('tel:$value');
+              },
+              icon: Icon(
+                Icons.call,
+                color: Colors.green[600],
+                size: 20,
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -646,7 +709,6 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-
               Expanded(
                 child: SingleChildScrollView(
                   controller: scrollController,
@@ -698,7 +760,62 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                           ),
                         ],
                       ),
+                      const SizedBox(height: 24),
 
+                      // Información del Cliente
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.person_outline,
+                                  color: Colors.blue[700],
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Información del Cliente',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.blue[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            _buildCustomerInfoRow(
+                                Icons.person,
+                                'Nombre',
+                                order.customerName ?? 'No disponible'
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCustomerInfoRow(
+                                Icons.phone,
+                                'Teléfono',
+                                order.customerPhone ?? 'No disponible'
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCustomerInfoRow(
+                                Icons.email,
+                                'Email',
+                                order.customerEmail ?? 'No disponible'
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCustomerInfoRow(
+                                Icons.location_on,
+                                'Dirección',
+                                order.customerAddress ?? 'No disponible'
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 24),
 
                       // Items
@@ -761,7 +878,7 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                                     ),
                                   ),
                                   Text(
-                                    '\$${item.total.toStringAsFixed(2)}',
+                                    'S/.${(item.price * item.quantity).toStringAsFixed(2)}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 16,
@@ -774,7 +891,6 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 24),
 
                       // Total
@@ -800,7 +916,7 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                               ),
                             ),
                             Text(
-                              '\$${order.total.toStringAsFixed(2)}',
+                              'S/.${order.total.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w700,
@@ -810,7 +926,6 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 32),
 
                       // Actions
@@ -891,7 +1006,7 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                                 ref.read(updateOrderStatusProvider)(order.id, v);
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
+                                  const SnackBar(
                                     content: Text('Estado actualizado'),
                                     backgroundColor: Colors.green,
                                   ),
@@ -905,9 +1020,7 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 24),
-
                         // Tracking Button
                         Container(
                           width: double.infinity,
@@ -945,7 +1058,6 @@ class _DeliveryOrderDetailSheetState extends ConsumerState<_DeliveryOrderDetailS
                           ),
                         ),
                       ],
-
                       const SizedBox(height: 32),
                     ],
                   ),

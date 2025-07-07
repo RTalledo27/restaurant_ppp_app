@@ -260,7 +260,7 @@ class ManageOrdersScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          '\$${order.total.toStringAsFixed(2)}',
+                          'S/.${order.total.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -506,7 +506,7 @@ class ManageOrdersScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       Text(
-                                        '\$${item.total.toStringAsFixed(2)}',
+                                        'S/.${item.total.toStringAsFixed(2)}',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 16,
@@ -545,7 +545,7 @@ class ManageOrdersScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 Text(
-                                  '\$${order.total.toStringAsFixed(2)}',
+                                  'S/.${order.total.toStringAsFixed(2)}',
                                   style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w700,

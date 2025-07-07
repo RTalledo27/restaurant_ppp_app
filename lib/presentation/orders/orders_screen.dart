@@ -433,7 +433,7 @@ class OrdersScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '\$${item.total.toStringAsFixed(2)}',
+                    'S/.${item.total.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -442,7 +442,7 @@ class OrdersScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '\$${item.item.price.toStringAsFixed(2)} c/u',
+                    'S/.${item.item.price.toStringAsFixed(2)} c/u',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[500],
@@ -495,7 +495,7 @@ class OrdersScreen extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          '\$${total.toStringAsFixed(2)}',
+                          'S/.${total.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -539,7 +539,7 @@ class OrdersScreen extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          '\$${total.toStringAsFixed(2)}',
+                          'S/.${total.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,

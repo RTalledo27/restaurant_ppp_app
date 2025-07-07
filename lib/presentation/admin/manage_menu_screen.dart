@@ -247,7 +247,7 @@ class ManageMenuScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '\$${item.price.toStringAsFixed(2)}',
+                            'S/.${item.price.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,

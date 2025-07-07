@@ -7,7 +7,6 @@ class OrderModel extends Order {
     required super.id,
     required super.userId,
     required super.branchId,
-
     required super.items,
     required super.total,
     required super.status,
@@ -15,6 +14,9 @@ class OrderModel extends Order {
     super.location,
     super.deliveryId,
     super.deliveryLocation,
+    super.customerName,
+    super.customerPhone,
+    super.customerAddress,
   });
 
   factory OrderModel.fromMap(Map<String, dynamic> map, String id) {
@@ -22,7 +24,6 @@ class OrderModel extends Order {
       id: id,
       userId: map['userId'] as String? ?? '',
       branchId: map['branchId'] as String? ?? '',
-
       items: (map['items'] as List<dynamic>? ?? [])
           .map((e) => OrderItem(
         id: e['id'] as String? ?? '',
@@ -38,6 +39,9 @@ class OrderModel extends Order {
       location: map['location'] as Map<String, dynamic>?,
       deliveryId: map['deliveryId'] as String?,
       deliveryLocation: map['deliveryLocation'] as Map<String, dynamic>?,
+      customerName: map['customerName'] as String?,
+      customerPhone: map['customerPhone'] as String?,
+      customerAddress: map['customerAddress'] as String?,
     );
   }
 
@@ -45,7 +49,6 @@ class OrderModel extends Order {
     return {
       'userId': userId,
       'branchId': branchId,
-
       'items': items
           .map((e) => {
         'id': e.id,
@@ -61,6 +64,9 @@ class OrderModel extends Order {
       'location': location,
       'deliveryId': deliveryId,
       'deliveryLocation': deliveryLocation,
+      'customerName': customerName,
+      'customerPhone': customerPhone,
+      'customerAddress': customerAddress,
     };
   }
 }

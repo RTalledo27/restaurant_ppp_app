@@ -221,7 +221,7 @@ class HomeAdminScreen extends ConsumerWidget {
               Expanded(
                 child: _buildStatCard(
                   title: 'Ingresos',
-                  value: '\$2,450',
+                  value: 'S/.2,450',
                   icon: Icons.attach_money,
                   color: Colors.purple,
                   trend: '+8%',

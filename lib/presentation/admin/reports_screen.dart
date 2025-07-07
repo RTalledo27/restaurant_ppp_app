@@ -280,13 +280,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         ),
         _buildMetricCard(
           'Ingresos Totales',
-          '\$${analytics.totalRevenue.toStringAsFixed(2)}',
+          'S/.${analytics.totalRevenue.toStringAsFixed(2)}',
           Icons.attach_money,
           Colors.green,
         ),
         _buildMetricCard(
           'Promedio/Pedido',
-          '\$${analytics.averageOrderValue.toStringAsFixed(2)}',
+          'S/.${analytics.averageOrderValue.toStringAsFixed(2)}',
           Icons.trending_up,
           Colors.orange,
         ),
@@ -488,7 +488,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               ),
               const Spacer(),
               Text(
-                '\$${analytics.totalRevenue.toStringAsFixed(2)}',
+                'S/.${analytics.totalRevenue.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 16, // ✅ Tamaño reducido
                   fontWeight: FontWeight.w700,
@@ -527,7 +527,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             ),
           ),
           Text(
-            '\$${amount.toStringAsFixed(2)}',
+            'S/.${amount.toStringAsFixed(2)}',
             style: TextStyle(
               fontSize: 13, // ✅ Tamaño reducido
               fontWeight: FontWeight.w700,
@@ -565,9 +565,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             ),
           ),
           const SizedBox(height: 16),
-          _buildStatRow('Pedido más alto:', '\$${analytics.highestOrderValue.toStringAsFixed(2)}'),
-          _buildStatRow('Pedido más bajo:', '\$${analytics.lowestOrderValue.toStringAsFixed(2)}'),
-          _buildStatRow('Mediana de pedidos:', '\$${analytics.medianOrderValue.toStringAsFixed(2)}'),
+          _buildStatRow('Pedido más alto:', 'S/.${analytics.highestOrderValue.toStringAsFixed(2)}'),
+          _buildStatRow('Pedido más bajo:', 'S/.${analytics.lowestOrderValue.toStringAsFixed(2)}'),
+          _buildStatRow('Mediana de pedidos:', 'S/.${analytics.medianOrderValue.toStringAsFixed(2)}'),
           if (analytics.firstOrderDate != null)
             _buildStatRow('Primer pedido:', _formatDate(analytics.firstOrderDate!)),
           if (analytics.lastOrderDate != null)
@@ -658,7 +658,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 ),
                 const Spacer(),
                 Text(
-                  '\$${order.total.toStringAsFixed(2)}',
+                  'S/.${order.total.toStringAsFixed(2)}',
                   style: const TextStyle(
                     fontSize: 15, // ✅ Tamaño reducido
                     fontWeight: FontWeight.w700,
